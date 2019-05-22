@@ -15,26 +15,36 @@ namespace Deployer;
 
 require_once 'recipe/common.php';
 
-task('deploy:full:actions', [
-    'deploy:prepare',
-    'deploy:lock',
-    'deploy:actions:before',
-    'deploy:release',
-    'deploy:update_code',
-    'deploy:shared',
-    'deploy:writable',
-    'deploy:vendors',
-    'deploy:clear_paths',
-    'magento:maintenance:enable',
-    'composer:install',
-    'magento:mode:production',
-    'magento:upgrade',
-    'magento:deploy:static',
-    'magento:di:compile',
-    'magento:maintenance:disable',
-    'deploy:symlink',
-    'deploy:actions:after',
-    'deploy:unlock',
-    'cleanup',
-    'success'
-]);
+task('deploy:full:actions', function() {
+    invoke('deploy:prepare');
+    invoke('deploy:lock');
+    invoke('deploy:actions:before');
+    invoke('deploy:release');
+    invoke('deploy:update_code');
+    invoke('deploy:shared');
+    invoke('deploy:writable');
+    invoke('deploy:vendors');
+    invoke('deploy:clear_paths');
+    invoke('composer:install');
+    invoke('magento:maintenance:enable');
+
+    if ((int)get("is_production") === 1) {
+        invoke('magento:mode:production');
+    } else {
+        invoke('magento:mode:developer');
+    }
+
+    invoke('magento:upgrade');
+    invoke('magento:deploy:static');
+
+    if ((int)get("is_production") === 1) {
+        invoke('magento:di:compile');
+    }
+
+    invoke('magento:maintenance:disable');
+    invoke('deploy:symlink');
+    invoke('deploy:actions:after');
+    invoke('deploy:unlock');
+    invoke('cleanup');
+    invoke('success');
+});

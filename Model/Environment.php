@@ -86,6 +86,87 @@ class Environment
     protected $keepReleases;
 
     /**
+     * @var string
+     */
+    protected $httpUser;
+
+    /**
+     * @var array
+     */
+    protected $sharedFiles;
+
+    /**
+     * @var array
+     */
+    protected $sharedDirs;
+
+    /**
+     * @var array
+     */
+    protected $writableDirs;
+
+    /**
+     * @var array
+     */
+    protected $clearPaths;
+
+    /**
+     * @var string
+     */
+    protected $slackWebhook;
+
+    /**
+     * @var string
+     */
+    protected $slackText;
+
+    /**
+     * @var string
+     */
+    protected $slackSuccessText;
+
+    /**
+     * @var string
+     */
+    protected $slackFailureText;
+
+    const DEFAULT_SHARED_FILES = [
+        'app/etc/env.php',
+        'app/etc/deployer/env.json',
+        'var/.maintenance.ip'
+    ];
+
+    const DEFAULT_SHARED_DIRS = [
+        'var/composer_home',
+        'var/log',
+        'var/cache',
+        'var/export',
+        'var/report',
+        'var/import_history',
+        'var/session',
+        'var/importexport',
+        'var/backups',
+        'var/tmp',
+        'pub/sitemaps',
+        'pub/media'
+    ];
+
+    const DEFAULT_CLEAR_PATHS = [
+        'pub/static/_cache',
+        'var/cache',
+        'var/page_cache',
+        'var/view_preprocessed',
+        'generated'
+    ];
+
+    const DEFAULT_WRITABLE_DIRS = [
+        'var',
+        'pub/static',
+        'pub/media',
+        'generation'
+    ];
+
+    /**
      * Environment constructor.
      * @param array $environmentData
      */
@@ -102,15 +183,47 @@ class Environment
         $this->languages = (isset($environmentData["languages"])) ? $environmentData["languages"] : "";
         $this->phpPath = (isset($environmentData["php_path"])) ? $environmentData["php_path"] : "";
         $this->composerPath = (isset($environmentData["composer_path"])) ? $environmentData["composer_path"] : "";
-        $this->beforeCommands = (isset($environmentData["additional_commands"]["before_deploy"])) ? $environmentData["additional_commands"]["before_deploy"] : [];
-        $this->afterCommands = (isset($environmentData["additional_commands"]["after_deploy"])) ? $environmentData["additional_commands"]["after_deploy"] : [];
-        $this->keepReleases = (isset($environmentData["keep_releases"]["after_deploy"])) ? (int)$environmentData["additional_commands"]["keep_releases"] : 3;
+        $this->beforeCommands = (isset($environmentData["additional_commands"]["before_deploy"]))
+            ? $environmentData["additional_commands"]["before_deploy"] : [];
+        $this->afterCommands = (isset($environmentData["additional_commands"]["after_deploy"]))
+            ? $environmentData["additional_commands"]["after_deploy"] : [];
+        $this->keepReleases = (isset($environmentData["keep_releases"]))
+            ? (int)$environmentData["keep_releases"] : 3;
+        $this->httpUser = (isset($environmentData["http_user"])) ? $environmentData["http_user"] : "";
+        $this->sharedFiles = array_unique(
+            array_merge(self::DEFAULT_SHARED_FILES,
+                (isset($environmentData["shared_files"])) ? $environmentData["shared_files"] : []
+            )
+        );
+        $this->sharedDirs = array_unique(
+            array_merge(self::DEFAULT_SHARED_DIRS,
+                (isset($environmentData["shared_dirs"])) ? $environmentData["shared_dirs"] : []
+            )
+        );
+        $this->writableDirs = array_unique(array_merge(self::DEFAULT_WRITABLE_DIRS,
+            (isset($environmentData["writable_dirs"])) ? $environmentData["writable_dirs"] : []
+            )
+        );
+        $this->clearPaths = array_unique(array_merge(self::DEFAULT_CLEAR_PATHS,
+            (isset($environmentData["clear_paths"])) ? $environmentData["clear_paths"] : []
+            )
+        );
+        $this->slackWebhook = isset($environmentData["slack_webhook"]) ? $environmentData["slack_webhook"] : "";
+        $this->slackText = isset($environmentData["slack_text"])
+            ? $environmentData["slack_text"]
+            : "ATTENTION! User _{{user}}_ is deploying the branch `{{branch}}` to *{{target}}* environment.";
+        $this->slackSuccessText = isset($environmentData["slack_success_text"])
+            ? $environmentData["slack_success_text"]
+            : "*{{target}}* was deployed without any error.";
+        $this->slackFailureText = isset($environmentData["slack_failure_text"])
+            ? $environmentData["slack_failure_text"]
+            : "";
     }
 
     /**
      * @return mixed
      */
-    public function getHostName() : string
+    public function getHostName(): string
     {
         return $this->hostName;
     }
@@ -126,7 +239,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getUser() : string
+    public function getUser(): string
     {
         return $this->user;
     }
@@ -142,7 +255,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getPassword() : string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -158,7 +271,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getPort() : string
+    public function getPort(): string
     {
         return $this->port;
     }
@@ -174,7 +287,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getDeployPath() : string
+    public function getDeployPath(): string
     {
         return $this->deployPath;
     }
@@ -190,7 +303,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getBranch() : string
+    public function getBranch(): string
     {
         return $this->branch;
     }
@@ -206,7 +319,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getIsProduction() : int
+    public function getIsProduction(): int
     {
         return $this->isProduction;
     }
@@ -222,7 +335,7 @@ class Environment
     /**
      * @return mixed
      */
-    public function getIdentityFile() : string
+    public function getIdentityFile(): string
     {
         return $this->identityFile;
     }
@@ -329,5 +442,149 @@ class Environment
     public function setKeepReleases(int $keepReleases): void
     {
         $this->keepReleases = $keepReleases;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttpUser()
+    {
+        return $this->httpUser;
+    }
+
+    /**
+     * @param string $httpUser
+     */
+    public function setHttpUser($httpUser)
+    {
+        $this->httpUser = $httpUser;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSharedFiles()
+    {
+        return $this->sharedFiles;
+    }
+
+    /**
+     * @param array $sharedFiles
+     */
+    public function setSharedFiles($sharedFiles)
+    {
+        $this->sharedFiles = $sharedFiles;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSharedDirs()
+    {
+        return $this->sharedDirs;
+    }
+
+    /**
+     * @param array $sharedDirs
+     */
+    public function setSharedDirs($sharedDirs)
+    {
+        $this->sharedDirs = $sharedDirs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWritableDirs()
+    {
+        return $this->writableDirs;
+    }
+
+    /**
+     * @param array $writableDirs
+     */
+    public function setWritableDirs($writableDirs)
+    {
+        $this->writableDirs = $writableDirs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getClearPaths()
+    {
+        return $this->clearPaths;
+    }
+
+    /**
+     * @param array $clearPaths
+     */
+    public function setClearPaths($clearPaths)
+    {
+        $this->clearPaths = $clearPaths;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlackWebhook()
+    {
+        return $this->slackWebhook;
+    }
+
+    /**
+     * @param string $slackWebhook
+     */
+    public function setSlackWebhook($slackWebhook)
+    {
+        $this->slackWebhook = $slackWebhook;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlackText()
+    {
+        return $this->slackText;
+    }
+
+    /**
+     * @param string $slackText
+     */
+    public function setSlackText($slackText)
+    {
+        $this->slackText = $slackText;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlackSuccessText()
+    {
+        return $this->slackSuccessText;
+    }
+
+    /**
+     * @param string $slackSuccessText
+     */
+    public function setSlackSuccessText($slackSuccessText)
+    {
+        $this->slackSuccessText = $slackSuccessText;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlackFailureText()
+    {
+        return $this->slackFailureText;
+    }
+
+    /**
+     * @param string $slackFailureText
+     */
+    public function setSlackFailureText($slackFailureText)
+    {
+        $this->slackFailureText = $slackFailureText;
     }
 }

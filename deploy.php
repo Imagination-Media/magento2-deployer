@@ -13,6 +13,7 @@
 
 namespace Deployer;
 
+require '../../deployer/recipes/recipe/slack.php';
 require_once 'recipe/common.php';
 require_once './Helper/Configuration.php';
 require_once './Model/Environment.php';
@@ -30,45 +31,16 @@ set('git_tty', $configuration->getGitTty());
 
 set('repository', $configuration->getRepositoryPath());
 
-set('shared_files', [
-    'app/etc/env.php',
-    'app/etc/deployer/env.json',
-    'var/.maintenance.ip'
-]);
-
-set('shared_dirs', [
-    'var/composer_home',
-    'var/log',
-    'var/cache',
-    'var/export',
-    'var/report',
-    'var/import_history',
-    'var/session',
-    'var/importexport',
-    'var/backups',
-    'var/tmp',
-    'pub/sitemaps',
-    'pub/media'
-]);
-
-set('writable_dirs', [
-    'var',
-    'pub/static',
-    'pub/media',
-    'generation'
-]);
-
-set('clear_paths', [
-    'pub/static/_cache',
-    'var/cache',
-    'var/page_cache',
-    'var/view_preprocessed',
-    'generated'
-]);
-
 set('allow_anonymous_stats', false);
 
 set('writable_use_sudo', false);
+
+/**
+ * Set the last commit hash as the release name
+ */
+set('release_name', function () {
+    return run('git ls-remote {{repository}} | awk "/{{branch}}/ {print \$1}"');
+});
 
 /**
  * Configure all hosts
@@ -87,16 +59,26 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
         ->set('before_commands', $environment->getBeforeCommands())
         ->set('after_commands', $environment->getAfterCommands())
         ->set('keep_releases', $environment->getKeepReleases())
+        ->set('http_user', $environment->getHttpUser())
+        ->set('writable_mode', 'chown')
+        ->set('languages', $environment->getLanguages())
+        ->set('shared_files', $environment->getSharedFiles())
+        ->set('shared_dirs', $environment->getSharedDirs())
+        ->set('writable_dirs', $environment->getWritableDirs())
+        ->set('clear_paths', $environment->getClearPaths())
+        ->set('slack_webhook', $environment->getSlackWebhook())
+        ->set('slack_text', $environment->getSlackText())
+        ->set('slack_success_text', $environment->getSlackSuccessText())
+        ->set('slack_failure_text', $environment->getSlackFailureText())
         ->identityFile($environment->getIdentityFile())
         ->addSshOption('UserKnownHostsFile', '/dev/null')
         ->addSshOption('StrictHostKeyChecking', 'no');
-
-    if ($environment->getPassword() !== "") {
-        host($environmentName)->password($environment->getPassword());
-    }
 }
 
 /**
+ *
+ * ========================================= DEPLOYMENT ACTIONS ============================================
+ *
  * Run a full deploy, with all actions, rebuilding everything
  */
 task('deploy:full', [
@@ -109,3 +91,33 @@ task('deploy:full', [
 task('deploy:update', [
     'deploy:update:actions'
 ]);
+
+/**
+ * ================== Set SLACK options ==========================
+ */
+
+set('slack_color', "#15bb3c");
+set('slack_failure_color', "#fa1212");
+
+task('before:deploy:slack:notify', function () {
+    if ((string)get("slack_webhook") !== "") {
+        invoke('slack:notify');
+    }
+});
+
+task('deploy:slack:success:notify', function () {
+    if ((string)get("slack_webhook") !== "") {
+        invoke('slack:notify:success');
+    }
+});
+
+task('deploy:slack:failed:notify', function () {
+    if ((string)get("slack_webhook") !== "") {
+        invoke('slack:notify:failure');
+    }
+});
+
+before('deploy:full', 'before:deploy:slack:notify');
+before('deploy:update', 'before:deploy:slack:notify');
+after('success', 'deploy:slack:success:notify');
+after('deploy:failed', 'deploy:slack:failed:notify');
