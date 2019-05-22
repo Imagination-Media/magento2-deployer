@@ -119,6 +119,6 @@ task('deploy:slack:failed:notify', function () {
 });
 
 before('deploy:full', 'before:deploy:slack:notify');
-before('deploy:update', 'before:deploy:slack:notify');
+//before('deploy:update', 'before:deploy:slack:notify');
 after('success', 'deploy:slack:success:notify');
 after('deploy:failed', 'deploy:slack:failed:notify');
