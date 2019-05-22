@@ -23,7 +23,6 @@ task('deploy:full:actions', function() {
     invoke('deploy:update_code');
     invoke('deploy:shared');
     invoke('deploy:writable');
-    invoke('deploy:vendors');
     invoke('deploy:clear_paths');
     invoke('composer:install');
     invoke('magento:maintenance:enable');
