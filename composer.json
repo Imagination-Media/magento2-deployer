@@ -1,7 +1,7 @@
 {
   "name": "imaginationmedia/deployer-magento2",
   "type": "php-package",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "license": "OSL-3.0",
   "description": "Deploy a Magento 2 website using deployer.org",
   "homepage": "https://www.imaginationmedia.com/",
@@ -12,7 +12,9 @@
   "authors": [
     {
       "name": "Igor Ludgero Miura",
-      "email": "igor@imaginationmedia.com"
+      "email": "igor@imaginationmedia.com",
+      "homepage": "https://www.imaginationmedia.com.br/",
+      "role": "Technical Lead"
     }
   ]
 }
