@@ -6,7 +6,7 @@
   "description": "Deploy a Magento 2 website using deployer.org",
   "homepage": "https://www.imaginationmedia.com/",
   "require": {
-    "php": "7.0.2|7.0.4|~7.0.6|~7.1.0",
+    "php": ">=7.0.0",
     "deployer/dist": "^6.0"
   },
   "authors": [
