@@ -25,7 +25,6 @@ task('deploy:full:actions', function() {
     invoke('deploy:writable');
     invoke('deploy:clear_paths');
     invoke('composer:install');
-    invoke('magento:maintenance:enable');
 
     if ((int)get("is_production") === 1) {
         invoke('magento:mode:production');
@@ -40,7 +39,6 @@ task('deploy:full:actions', function() {
         invoke('magento:di:compile');
     }
 
-    invoke('magento:maintenance:disable');
     invoke('deploy:symlink');
     invoke('deploy:actions:after');
     invoke('deploy:unlock');
