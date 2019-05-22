@@ -86,11 +86,12 @@ task('deploy:full', [
 ]);
 
 /**
+ * NOT AVAILABLE YET
  * Update current release, applying recent changes
  */
-task('deploy:update', [
+/*task('deploy:update', [
     'deploy:update:actions'
-]);
+]);*/
 
 /**
  * ================== Set SLACK options ==========================
