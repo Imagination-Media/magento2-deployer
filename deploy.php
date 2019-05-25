@@ -22,6 +22,46 @@ require_once './Configuration/Mode/Full.php';
 require_once './Configuration/Mode/Update.php';
 
 use Deployer\Helper\Configuration;
+use Deployer\Task\Context;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+
+/**
+ * ====== Use custom invoke function to ignore tasks declared as ignored on env.json ==========================
+ */
+
+function invoke_custom($task)
+{
+    if (!in_array($task, get("ignored_steps"))) {
+        $hosts = [Context::get()->getHost()];
+        $tasks = Deployer::get()->scriptManager->getTasks($task, $hosts);
+
+        $executor = Deployer::get()->seriesExecutor;
+        $executor->run($tasks, $hosts);
+    } else {
+        writeln("➤ Step ".$task." was ignored because it's set as ignored on env.json file.");
+    }
+}
+
+/**
+ * =============================== GLOB function to find files including subdirectories ========================
+ */
+if ( ! function_exists('glob_recursive'))
+{
+    function glob_recursive($pattern, $flags = 0)
+    {
+        $files = glob($pattern, $flags);
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
+        {
+            $files = array_merge($files, glob_recursive($dir.'/'.basename($pattern), $flags));
+        }
+        return $files;
+    }
+}
+
+/**
+ * ============================================== CONFIGURE DEFAULT SETTINGS ===================================
+ */
 
 $configuration = new Configuration();
 
@@ -31,9 +71,13 @@ set('git_tty', $configuration->getGitTty());
 
 set('repository', $configuration->getRepositoryPath());
 
+set('is_composer_installation', false);
+
 set('allow_anonymous_stats', false);
 
 set('writable_use_sudo', false);
+
+option('mode', null, InputOption::VALUE_OPTIONAL, 'Set the deployment mode.');
 
 /**
  * Set the last commit hash as the release name
@@ -70,6 +114,7 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
         ->set('slack_text', $environment->getSlackText())
         ->set('slack_success_text', $environment->getSlackSuccessText())
         ->set('slack_failure_text', $environment->getSlackFailureText())
+        ->set('ignored_steps', $environment->getIgnoredSteps())
         ->identityFile($environment->getIdentityFile())
         ->addSshOption('UserKnownHostsFile', '/dev/null')
         ->addSshOption('StrictHostKeyChecking', 'no');
@@ -79,22 +124,20 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
  *
  * ========================================= DEPLOYMENT ACTIONS ============================================
  *
- * Run a full deploy, with all actions, rebuilding everything
  */
-task('deploy:full', [
-    'deploy:full:actions'
-]);
+task('deploy', function () {
+    if (input()->hasOption('mode') &&
+        (string)input()->getOption('mode') === "full") {
+        writeln("➤ Deploying using FULL mode");
+        invoke_custom('deploy:full:actions');
+    } else {
+        writeln("➤ Deploying using UPDATE mode");
+        invoke_custom('deploy:update:actions');
+    }
+});
 
 /**
- * NOT AVAILABLE YET
- * Update current release, applying recent changes
- */
-/*task('deploy:update', [
-    'deploy:update:actions'
-]);*/
-
-/**
- * ================== Set SLACK options ==========================
+ * ========================================== Set SLACK options ============================================
  */
 
 set('slack_color', "#15bb3c");
@@ -102,23 +145,22 @@ set('slack_failure_color', "#fa1212");
 
 task('before:deploy:slack:notify', function () {
     if ((string)get("slack_webhook") !== "") {
-        invoke('slack:notify');
+        invoke_custom('slack:notify');
     }
 });
 
 task('deploy:slack:success:notify', function () {
     if ((string)get("slack_webhook") !== "") {
-        invoke('slack:notify:success');
+        invoke_custom('slack:notify:success');
     }
 });
 
 task('deploy:slack:failed:notify', function () {
     if ((string)get("slack_webhook") !== "") {
-        invoke('slack:notify:failure');
+        invoke_custom('slack:notify:failure');
     }
 });
 
-before('deploy:full', 'before:deploy:slack:notify');
-//before('deploy:update', 'before:deploy:slack:notify');
+before('deploy', 'before:deploy:slack:notify');
 after('success', 'deploy:slack:success:notify');
 after('deploy:failed', 'deploy:slack:failed:notify');

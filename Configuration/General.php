@@ -28,8 +28,16 @@ task('magento:upgrade', function () {
     run("cd {{release_path}} && {{php}} bin/magento setup:upgrade");
 });
 
+task('magento:upgrade:keep:generated', function () {
+    run("cd {{release_path}} && {{php}} bin/magento setup:upgrade --keep-generated");
+});
+
 task('magento:deploy:static', function () {
-    run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy -f {{languages}}");
+    run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy {{languages}}");
+});
+
+task('magento:deploy:static:refresh:version', function () {
+    run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy --refresh-content-version-only");
 });
 
 task('magento:mode:production', function () {
@@ -78,4 +86,27 @@ task('deploy:actions:after', function () {
             run("cd {{release_path}} && " . $afterCommand);
         }
     }
+});
+
+/**
+ * ================================== GENERAL COMMANDS ============================================
+ */
+task('create:release:from:last:release', function () {
+    run("cp -R {{previous_release}} {{release_path}}");
+});
+
+task('generated:db:schema', function () {
+    writeln("➤ Creating the database schema file. It will be available on var/db_schema.json");
+    if ((int)get("is_composer_installation") === 1) {
+        run("cd {{release_path}} && php vendor/imaginationmedia/deployer-magento2/Helper/Scripts/db_schema_generator.php 1 {{release_path}}");
+    } else {
+        run("cd {{release_path}} && php deployment/Helper/Scripts/db_schema_generator.php 1 {{release_path}}");
+    }
+});
+
+/**
+ * ================================== GIT COMMANDS =================================================
+ */
+task('git:update:base:code', function () {
+    run("cd {{release_path}} && git stash && git pull origin {{branch}}");
 });

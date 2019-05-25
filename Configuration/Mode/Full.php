@@ -16,32 +16,35 @@ namespace Deployer;
 require_once 'recipe/common.php';
 
 task('deploy:full:actions', function() {
-    invoke('deploy:prepare');
-    invoke('deploy:lock');
-    invoke('deploy:actions:before');
-    invoke('deploy:release');
-    invoke('deploy:update_code');
-    invoke('deploy:shared');
-    invoke('deploy:writable');
-    invoke('deploy:clear_paths');
-    invoke('composer:install');
+    invoke_custom('deploy:prepare');
+    invoke_custom('deploy:lock');
+    invoke_custom('deploy:actions:before');
+    invoke_custom('deploy:release');
+    invoke_custom('deploy:update_code');
+    invoke_custom('deploy:shared');
+    invoke_custom('deploy:writable');
+    invoke_custom('deploy:clear_paths');
+    invoke_custom('composer:install');
 
     if ((int)get("is_production") === 1) {
-        invoke('magento:mode:production');
+        invoke_custom('magento:mode:production');
     } else {
-        invoke('magento:mode:developer');
+        invoke_custom('magento:mode:developer');
     }
 
-    invoke('magento:upgrade');
-    invoke('magento:deploy:static');
+    invoke_custom('magento:upgrade');
 
     if ((int)get("is_production") === 1) {
-        invoke('magento:di:compile');
+        invoke_custom('magento:deploy:static');
     }
 
-    invoke('deploy:symlink');
-    invoke('deploy:actions:after');
-    invoke('deploy:unlock');
-    invoke('cleanup');
-    invoke('success');
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:di:compile');
+    }
+
+    invoke_custom('deploy:symlink');
+    invoke_custom('deploy:actions:after');
+    invoke_custom('deploy:unlock');
+    invoke_custom('cleanup');
+    invoke_custom('success');
 });
