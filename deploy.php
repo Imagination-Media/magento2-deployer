@@ -83,7 +83,7 @@ option('mode', null, InputOption::VALUE_OPTIONAL, 'Set the deployment mode.');
  * Set the last commit hash as the release name
  */
 set('release_name', function () {
-    return run('git ls-remote {{repository}} | awk "/{{branch}}/ {print \$1}"');
+    return run('git ls-remote {{repository}} | awk "/{{branch}}/ print substr(\$1,0,8)}"');
 });
 
 /**
