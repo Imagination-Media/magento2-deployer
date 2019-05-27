@@ -13,22 +13,35 @@
 
 namespace Deployer;
 
-task('deploy:update:actions', [
-    'deploy:prepare',
-    'deploy:lock',
-    'deploy:actions:before',
-    'deploy:update_code',
-    'deploy:vendors',
-    'deploy:clear_paths',
-    'magento:maintenance:enable',
-    'composer:install',
-    'magento:mode:production',
-    'magento:upgrade',
-    'magento:deploy:static',
-    'magento:di:compile',
-    'magento:maintenance:disable',
-    'deploy:actions:after',
-    'deploy:unlock',
-    'cleanup',
-    'success'
-]);
+task('deploy:update:actions', function () {
+    $configurationHelper = new \Deployer\Helper\Configuration();
+    invoke_custom('deploy:prepare');
+    invoke_custom('deploy:lock');
+    invoke_custom('deploy:actions:before');
+    invoke_custom('deploy:release');
+    invoke_custom('create:release:from:last:release');
+    invoke_custom('git:update:base:code');
+    invoke_custom('composer:install');
+    invoke_custom('generated:db:schema');
+
+    if ($configurationHelper->isSetupUpgradeNecessary()) {
+        invoke_custom('magento:upgrade:keep:generated');
+    }
+
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:deploy:static');
+        invoke_custom('magento:deploy:static:refresh:version');
+    }
+
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:di:compile');
+    }
+
+    invoke_custom('magento:cache:flush');
+
+    invoke_custom('deploy:symlink');
+    invoke_custom('deploy:actions:after');
+    invoke_custom('deploy:unlock');
+    invoke_custom('cleanup');
+    invoke_custom('success');
+});

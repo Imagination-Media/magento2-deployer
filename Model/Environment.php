@@ -130,9 +130,13 @@ class Environment
      */
     protected $slackFailureText;
 
+    /**
+     * @var array
+     */
+    protected $ignoredSteps;
+
     const DEFAULT_SHARED_FILES = [
         'app/etc/env.php',
-        'app/etc/deployer/env.json',
         'var/.maintenance.ip'
     ];
 
@@ -148,11 +152,12 @@ class Environment
         'var/backups',
         'var/tmp',
         'pub/sitemaps',
-        'pub/media'
+        'pub/media',
+        'pub/static'
     ];
 
     const DEFAULT_CLEAR_PATHS = [
-        'pub/static/_cache',
+        'pub/static',
         'var/cache',
         'var/page_cache',
         'var/view_preprocessed',
@@ -218,6 +223,9 @@ class Environment
         $this->slackFailureText = isset($environmentData["slack_failure_text"])
             ? $environmentData["slack_failure_text"]
             : "";
+        $this->ignoredSteps = isset($environmentData["ignored_steps"])
+            ? $environmentData["ignored_steps"]
+            : [];
     }
 
     /**
@@ -375,7 +383,7 @@ class Environment
     /**
      * @param string $phpPath
      */
-    public function setPhpPath(string $phpPath): void
+    public function setPhpPath(string $phpPath)
     {
         $this->phpPath = $phpPath;
     }
@@ -391,7 +399,7 @@ class Environment
     /**
      * @param string $composerPath
      */
-    public function setComposerPath(string $composerPath): void
+    public function setComposerPath(string $composerPath)
     {
         $this->composerPath = $composerPath;
     }
@@ -439,7 +447,7 @@ class Environment
     /**
      * @param int $keepReleases
      */
-    public function setKeepReleases(int $keepReleases): void
+    public function setKeepReleases(int $keepReleases)
     {
         $this->keepReleases = $keepReleases;
     }
@@ -586,5 +594,21 @@ class Environment
     public function setSlackFailureText($slackFailureText)
     {
         $this->slackFailureText = $slackFailureText;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIgnoredSteps(): array
+    {
+        return $this->ignoredSteps;
+    }
+
+    /**
+     * @param array $ignoredSteps
+     */
+    public function setIgnoredSteps(array $ignoredSteps)
+    {
+        $this->ignoredSteps = $ignoredSteps;
     }
 }
