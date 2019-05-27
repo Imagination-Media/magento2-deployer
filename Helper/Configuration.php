@@ -121,9 +121,10 @@ class Configuration
 
     /**
      * Is the command setup:upgrade necessary?
+     * @param string $databaseSchema
      * @return bool
      */
-    public function isSetupUpgradeNecessary() : bool
+    public function isSetupUpgradeNecessary(string $databaseSchema) : bool
     {
         /**
          * =================== Check installed packages ====================
@@ -167,15 +168,17 @@ class Configuration
             if (key_exists($installedKey, $configModules) &&
                 (int)$configModules[$installedKey] === 0) {
                 unset($installedPackages[$installedKey]);
-            }/* elseif (!key_exists($installedKey, $configModules)) {
-                return true; //So we have to run setup:upgrade to install the new module
-            }*/
+            }
         }
+
+        /**
+         * Sort order items alphabetically
+         */
+        ksort($installedPackages);
 
         /**
          * ======================== Get installed version from the database ==========================
          */
-        $databaseSchema = file_get_contents($this->projectRoot . "/var/db_schema.json");
         $databaseSchema = json_decode($databaseSchema, true);
 
         foreach ($installedPackages as $installedName => $installedVersion) {

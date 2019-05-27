@@ -36,6 +36,8 @@ if (isset($argv[1]) && is_string($argv[1]) && (int)$argv[1] === 1 &&
         }
     }
 
+    ksort($moduleVersions);
+
     $fp = fopen($argv[2] . '/var/db_schema.json', 'w');
     fwrite($fp, json_encode($moduleVersions));
     fclose($fp);

@@ -22,9 +22,17 @@ task('deploy:update:actions', function () {
     invoke_custom('create:release:from:last:release');
     invoke_custom('git:update:base:code');
     invoke_custom('composer:install');
+
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:mode:production');
+    } else {
+        invoke_custom('magento:mode:developer');
+    }
+
     invoke_custom('generated:db:schema');
 
-    if ($configurationHelper->isSetupUpgradeNecessary()) {
+    $schema = run("cat {{release_path}}/var/db_schema.json");
+    if ($configurationHelper->isSetupUpgradeNecessary($schema)) {
         invoke_custom('magento:upgrade:keep:generated');
     }
 
