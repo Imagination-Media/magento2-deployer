@@ -71,7 +71,11 @@ set('git_tty', $configuration->getGitTty());
 
 set('repository', $configuration->getRepositoryPath());
 
-set('is_composer_installation', false);
+if (strpos(__DIR__, 'vendor/imaginationmedia/deployer-magento2') !== false) {
+    set('is_composer_installation', true);
+} else {
+    set('is_composer_installation', false);
+}
 
 set('allow_anonymous_stats', false);
 

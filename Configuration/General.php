@@ -92,7 +92,7 @@ task('deploy:actions:after', function () {
  * ================================== GENERAL COMMANDS ============================================
  */
 task('create:release:from:last:release', function () {
-    run("cp -R {{previous_release}} {{release_path}}");
+    run("cp -a {{previous_release}}/. {{release_path}}");
 });
 
 task('generated:db:schema', function () {
@@ -108,5 +108,5 @@ task('generated:db:schema', function () {
  * ================================== GIT COMMANDS =================================================
  */
 task('git:update:base:code', function () {
-    run("cd {{release_path}} && git stash && git pull origin {{branch}}");
+    run("cd {{release_path}} && git reset --hard && git pull origin {{branch}}");
 });
