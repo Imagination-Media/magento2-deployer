@@ -19,8 +19,10 @@ task('deploy:update:actions', function () {
     invoke_custom('deploy:lock');
     invoke_custom('deploy:actions:before');
     invoke_custom('deploy:release');
-    invoke_custom('create:release:from:last:release');
-    invoke_custom('git:update:base:code');
+    invoke_custom('deploy:update_code');
+    invoke_custom('deploy:shared');
+    invoke_custom('deploy:writable');
+    invoke_custom('deploy:clear_paths');
     invoke_custom('composer:install');
 
     if ((int)get("is_production") === 1) {

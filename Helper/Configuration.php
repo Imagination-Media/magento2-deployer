@@ -126,69 +126,75 @@ class Configuration
      */
     public function isSetupUpgradeNecessary(string $databaseSchema) : bool
     {
-        /**
-         * =================== Check installed packages ====================
-         */
-        $appCodeItems = glob_recursive($this->projectRoot . "app/code/module.xml");
-        $vendorItems = glob_recursive($this->projectRoot . "vendor/module.xml");
-        $finalItems = array_merge($appCodeItems, $vendorItems);
+        try {
+            /**
+             * =================== Check installed packages ====================
+             */
+            $appCodeItems = glob_recursive($this->projectRoot . "app/code/module.xml");
+            $vendorItems = glob_recursive($this->projectRoot . "vendor/module.xml");
+            $finalItems = array_merge($appCodeItems, $vendorItems);
 
-        /**
-         * Remove dev items
-         */
-        foreach ($finalItems as $finalItemKey => $finalItemValue) {
-            if (stripos($finalItemValue, '/dev/') !== false) {
-                unset($finalItems[$finalItemKey]);
-            }
-        }
-
-        /**
-         * Get values from the xml to an array
-         */
-        $installedPackages = [];
-        foreach ($finalItems as $finalItem) {
-            $xmlFile = simplexml_load_string(file_get_contents($finalItem));
-            $value = json_encode($xmlFile);
-            $value = json_decode($value, true);
-            $value = $value["module"];
-            $installedPackages[$value['@attributes']['name']] = $value['@attributes']['setup_version'];
-        }
-
-        /**
-         * ======================== Get modules enabled on etc/config.php ============================
-         */
-        $configModules = include $this->projectRoot . '/app/etc/config.php';
-        $configModules = $configModules['modules'];
-
-        /**
-         * Remove non enabled modules from installedPackages variable
-         * and check for items that are not in app/etc/config.php file
-         */
-        foreach ($installedPackages as $installedKey => $installedPackage) {
-            if (key_exists($installedKey, $configModules) &&
-                (int)$configModules[$installedKey] === 0) {
-                unset($installedPackages[$installedKey]);
-            }
-        }
-
-        /**
-         * Sort order items alphabetically
-         */
-        ksort($installedPackages);
-
-        /**
-         * ======================== Get installed version from the database ==========================
-         */
-        $databaseSchema = json_decode($databaseSchema, true);
-
-        foreach ($installedPackages as $installedName => $installedVersion) {
-            foreach ($databaseSchema as $schemaModuleName => $schemaModuleVersion) {
-                if ($installedName === $schemaModuleName && $installedVersion !== $schemaModuleVersion) {
-                    return true;
+            /**
+             * Remove dev items
+             */
+            foreach ($finalItems as $finalItemKey => $finalItemValue) {
+                if (stripos($finalItemValue, '/dev/') !== false) {
+                    unset($finalItems[$finalItemKey]);
                 }
             }
-        }
 
-        return false;
+            /**
+             * Get values from the xml to an array
+             */
+            $installedPackages = [];
+            foreach ($finalItems as $finalItem) {
+                $xmlFile = simplexml_load_string(file_get_contents($finalItem));
+                $value = json_encode($xmlFile);
+                $value = json_decode($value, true);
+                $value = $value["module"];
+                if (isset($value['@attributes']['setup_version'])) {
+                    $installedPackages[$value['@attributes']['name']] = $value['@attributes']['setup_version'];
+                }
+            }
+
+            /**
+             * ======================== Get modules enabled on etc/config.php ============================
+             */
+            $configModules = include $this->projectRoot . '/app/etc/config.php';
+            $configModules = $configModules['modules'];
+
+            /**
+             * Remove non enabled modules from installedPackages variable
+             * and check for items that are not in app/etc/config.php file
+             */
+            foreach ($installedPackages as $installedKey => $installedPackage) {
+                if (key_exists($installedKey, $configModules) &&
+                    (int)$configModules[$installedKey] === 0) {
+                    unset($installedPackages[$installedKey]);
+                }
+            }
+
+            /**
+             * Sort order items alphabetically
+             */
+            ksort($installedPackages);
+
+            /**
+             * ======================== Get installed version from the database ==========================
+             */
+            $databaseSchema = json_decode($databaseSchema, true);
+
+            foreach ($installedPackages as $installedName => $installedVersion) {
+                foreach ($databaseSchema as $schemaModuleName => $schemaModuleVersion) {
+                    if ($installedName === $schemaModuleName && $installedVersion !== $schemaModuleVersion) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (\Exception $ex) {
+            return true;
+        }
     }
 }

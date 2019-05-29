@@ -91,9 +91,6 @@ task('deploy:actions:after', function () {
 /**
  * ================================== GENERAL COMMANDS ============================================
  */
-task('create:release:from:last:release', function () {
-    run("cp -a {{previous_release}}/. {{release_path}}");
-});
 
 task('generated:db:schema', function () {
     writeln("➤ Creating the database schema file. It will be available on var/db_schema.json");
