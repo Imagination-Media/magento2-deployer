@@ -48,7 +48,7 @@ task('deploy:update:actions', function () {
     }
 
     invoke_custom('magento:cache:flush');
-
+    invoke_custom('deploy:actions:before:symlink');
     invoke_custom('deploy:symlink');
     invoke_custom('deploy:actions:after');
     invoke_custom('deploy:unlock');

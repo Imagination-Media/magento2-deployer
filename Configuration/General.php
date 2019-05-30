@@ -88,6 +88,15 @@ task('deploy:actions:after', function () {
     }
 });
 
+task('deploy:actions:before:symlink', function () {
+    $beforeCommands = get("actions_before_symlink");
+    if (count($beforeCommands) > 0) {
+        foreach ($beforeCommands as $beforeCommand) {
+            run("cd {{release_path}} && " . $beforeCommand);
+        }
+    }
+});
+
 /**
  * ================================== GENERAL COMMANDS ============================================
  */

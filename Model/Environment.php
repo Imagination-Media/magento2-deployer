@@ -135,6 +135,11 @@ class Environment
      */
     protected $ignoredSteps;
 
+    /**
+     * @var array
+     */
+    protected $actionsBeforeSymlinkChange;
+
     const DEFAULT_SHARED_FILES = [
         'app/etc/env.php',
         'var/.maintenance.ip'
@@ -225,6 +230,9 @@ class Environment
             : "";
         $this->ignoredSteps = isset($environmentData["ignored_steps"])
             ? $environmentData["ignored_steps"]
+            : [];
+        $this->actionsBeforeSymlinkChange = isset($environmentData["additional_commands"]["before_symlink_change"])
+            ? $environmentData["additional_commands"]["before_symlink_change"]
             : [];
     }
 
@@ -610,5 +618,21 @@ class Environment
     public function setIgnoredSteps(array $ignoredSteps)
     {
         $this->ignoredSteps = $ignoredSteps;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActionsBeforeSymlinkChange(): array
+    {
+        return $this->actionsBeforeSymlinkChange;
+    }
+
+    /**
+     * @param array $actionsBeforeSymlinkChange
+     */
+    public function setActionsBeforeSymlinkChange(array $actionsBeforeSymlinkChange)
+    {
+        $this->actionsBeforeSymlinkChange = $actionsBeforeSymlinkChange;
     }
 }
