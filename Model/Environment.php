@@ -227,7 +227,7 @@ class Environment
             : "*{{target}}* was deployed without any error.";
         $this->slackFailureText = isset($environmentData["slack_failure_text"])
             ? $environmentData["slack_failure_text"]
-            : "";
+            : "An error happened deploying `{{branch}}` to *{{target}}* environment.";
         $this->ignoredSteps = isset($environmentData["ignored_steps"])
             ? $environmentData["ignored_steps"]
             : [];
