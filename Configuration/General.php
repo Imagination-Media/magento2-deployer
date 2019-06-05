@@ -64,7 +64,11 @@ task('magento:cache:flush', function () {
  * ================================== COMPOSER ===========================================
  */
 task('composer:install', function () {
-    run("cd {{release_path}} && {{composer}} install");
+    if (get("composer_ignore_requirements")) {
+        run("cd {{release_path}} && {{composer}} install --ignore-platform-reqs");
+    } else {
+        run("cd {{release_path}} && {{composer}} install");
+    }
 });
 
 /**

@@ -1,7 +1,7 @@
 {
   "name": "imaginationmedia/deployer-magento2",
   "type": "php-package",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "OSL-3.0",
   "description": "Deploy a Magento 2 website using deployer.org",
   "homepage": "https://www.imaginationmedia.com/",

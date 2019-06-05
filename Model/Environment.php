@@ -140,6 +140,11 @@ class Environment
      */
     protected $actionsBeforeSymlinkChange;
 
+    /**
+     * @var bool
+     */
+    protected $composerIgnoreRequirements;
+
     const DEFAULT_SHARED_FILES = [
         'app/etc/env.php',
         'var/.maintenance.ip'
@@ -234,6 +239,8 @@ class Environment
         $this->actionsBeforeSymlinkChange = isset($environmentData["additional_commands"]["before_symlink_change"])
             ? $environmentData["additional_commands"]["before_symlink_change"]
             : [];
+        $this->composerIgnoreRequirements = isset($environmentData["composer_ignore_requirements"])
+            ? (bool)$environmentData["composer_ignore_requirements"] : false;
     }
 
     /**
@@ -634,5 +641,21 @@ class Environment
     public function setActionsBeforeSymlinkChange(array $actionsBeforeSymlinkChange)
     {
         $this->actionsBeforeSymlinkChange = $actionsBeforeSymlinkChange;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isComposerIgnoreRequirements(): bool
+    {
+        return $this->composerIgnoreRequirements;
+    }
+
+    /**
+     * @param bool $composerIgnoreRequirements
+     */
+    public function setComposerIgnoreRequirements(bool $composerIgnoreRequirements)
+    {
+        $this->composerIgnoreRequirements = $composerIgnoreRequirements;
     }
 }

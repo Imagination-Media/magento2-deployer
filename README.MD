@@ -24,28 +24,60 @@ Create a file `env.json` inside app/etc/deployer and configure everything about 
 ```json
 {
   "project": {
-    "project_name": "Imagination Media Innovations Website",
-    "repository_path": "git@bitbucket.org:imagination-media/innovations-website-m2.git",
-    "git_tty" : false,
-    "keep_releases" : 5
+    "project_name": "Project Name",
+    "repository_path": "git@bitbucket.org:project/repo.git",
+    "git_tty" : false
   },
   "environments" : {
-    "production" : {
-      "hostname" : "54.177.43.119",
-      "user" : "root",
-      "password" : "",
-      "port" : "",
-      "deploy_path" : "/var/www",
-      "branch" : "master",
-      "is_production" : 1,
-      "identity_file" : "/Users/igorludgeromiura/.ssh/aws-innovate.pem",
+    "staging" : {
+      "hostname" : "1.2.3.4",
+      "user" : "deploy",
+      "port" : "2223",
+      "deploy_path" : "/home/path/to/server",
+      "branch" : "staging",
+      "is_production" : 0,
+      "identity_file" : "~/.ssh/id_rsa",
       "languages" : "en_US",
       "php_path" : "/usr/bin/php",
       "composer_path" : "/usr/bin/composer",
+      "keep_releases" : 3,
+      "http_user" : "deploy",
+      "slack_webhook" : "https://hooks.slack.com/services/hook/id",
       "additional_commands" : {
         "before_deploy" : [],
-        "after_deploy" : ["sudo service httpd reload"]
-      }
+        "after_deploy" : [],
+        "actions_before_symlink" : []
+      },
+      "shared_files" : [],
+      "shared_dirs" : [],
+      "writable_dirs" : [],
+      "clear_paths" : [],
+      "ignored_steps" : [],
+      "composer_ignore_requirements" : false
+    },
+    "production" : {
+      "hostname" : "1.2.3.4",
+      "user" : "deploy",
+      "port" : "2223",
+      "deploy_path" : "/home/path/to/server",
+      "branch" : "staging",
+      "is_production" : 1,
+      "identity_file" : "~/.ssh/id_rsa",
+      "languages" : "en_US",
+      "php_path" : "/usr/bin/php",
+      "composer_path" : "/usr/bin/composer",
+      "keep_releases" : 3,
+      "http_user" : "deploy",
+      "slack_webhook" : "https://hooks.slack.com/services/hook/id",
+      "additional_commands" : {
+        "before_deploy" : [],
+        "after_deploy" : [],
+        "actions_before_symlink" : []
+      },
+      "shared_files" : [],
+      "shared_dirs" : [],
+      "writable_dirs" : [],
+      "clear_paths" : []
     }
   }
 }
