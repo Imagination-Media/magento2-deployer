@@ -145,6 +145,11 @@ class Environment
      */
     protected $composerIgnoreRequirements;
 
+    /**
+     * @var array
+     */
+    protected $themes;
+
     const DEFAULT_SHARED_FILES = [
         'app/etc/env.php',
         'var/.maintenance.ip'
@@ -241,6 +246,8 @@ class Environment
             : [];
         $this->composerIgnoreRequirements = isset($environmentData["composer_ignore_requirements"])
             ? (bool)$environmentData["composer_ignore_requirements"] : false;
+        $this->themes = (isset($environmentData["themes"]) && $environmentData["themes"] !== "")
+            ? $environmentData["themes"] : [];
     }
 
     /**
@@ -657,5 +664,21 @@ class Environment
     public function setComposerIgnoreRequirements(bool $composerIgnoreRequirements)
     {
         $this->composerIgnoreRequirements = $composerIgnoreRequirements;
+    }
+
+    /**
+     * @return array
+     */
+    public function getThemes(): array
+    {
+        return $this->themes;
+    }
+
+    /**
+     * @param array $themes
+     */
+    public function setThemes(array $themes)
+    {
+        $this->themes = $themes;
     }
 }

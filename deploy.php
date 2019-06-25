@@ -118,6 +118,7 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
         ->set('ignored_steps', $environment->getIgnoredSteps())
         ->set('composer_ignore_requirements', $environment->isComposerIgnoreRequirements())
         ->set('actions_before_symlink', $environment->getActionsBeforeSymlinkChange())
+        ->set('themes', $environment->getThemes())
         ->identityFile($environment->getIdentityFile())
         ->addSshOption('UserKnownHostsFile', '/dev/null')
         ->addSshOption('StrictHostKeyChecking', 'no');

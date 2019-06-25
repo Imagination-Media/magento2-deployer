@@ -33,7 +33,20 @@ task('magento:upgrade:keep:generated', function () {
 });
 
 task('magento:deploy:static', function () {
-    run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy {{languages}}");
+    $themes = get("themes");
+    if (count($themes) > 0) {
+        $themeString = "";
+        foreach ($themes as $theme) {
+            if ($themeString === "") {
+                $themeString = "--theme ".$theme;
+            } else {
+                $themeString .= " --theme ".$theme;
+            }
+        }
+        run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy ".$themeString." {{languages}}");
+    } else {
+        run("cd {{release_path}} && {{php}} bin/magento setup:static-content:deploy {{languages}}");
+    }
 });
 
 task('magento:deploy:static:refresh:version', function () {
@@ -112,11 +125,4 @@ task('generated:db:schema', function () {
     } else {
         run("cd {{release_path}} && php deployment/Helper/Scripts/db_schema_generator.php 1 {{release_path}}");
     }
-});
-
-/**
- * ================================== GIT COMMANDS =================================================
- */
-task('git:update:base:code', function () {
-    run("cd {{release_path}} && git reset --hard && git pull origin {{branch}}");
 });
