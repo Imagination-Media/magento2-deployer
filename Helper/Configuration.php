@@ -184,10 +184,16 @@ class Configuration
              */
             $databaseSchema = json_decode($databaseSchema, true);
 
+            /**
+             * Check all the extensions that were already installed and also if we are installing new extensions
+             */
             foreach ($installedPackages as $installedName => $installedVersion) {
+                if (!key_exists($installedName, $databaseSchema)) {
+                    return true; //It's a new extension
+                }
                 foreach ($databaseSchema as $schemaModuleName => $schemaModuleVersion) {
                     if ($installedName === $schemaModuleName && $installedVersion !== $schemaModuleVersion) {
-                        return true;
+                        return true; //We are updating an extension
                     }
                 }
             }
