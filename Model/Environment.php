@@ -145,6 +145,11 @@ class Environment
      */
     protected $composerIgnoreRequirements;
 
+    /***
+     * @var bool
+     */
+    protected $isSymlinkFullpath;
+
     /**
      * @var array
      */
@@ -248,6 +253,8 @@ class Environment
             ? (bool)$environmentData["composer_ignore_requirements"] : false;
         $this->themes = (isset($environmentData["themes"]) && $environmentData["themes"] !== "")
             ? $environmentData["themes"] : [];
+        $this->isSymlinkFullpath = (isset($environmentData["symlink_fullpath"]) && $environmentData["symlink_fullpath"] !== "")
+            ? (bool)$environmentData["symlink_fullpath"] : false;
     }
 
     /**
@@ -680,5 +687,21 @@ class Environment
     public function setThemes(array $themes)
     {
         $this->themes = $themes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSymlinkFullpath(): bool
+    {
+        return $this->isSymlinkFullpath;
+    }
+
+    /**
+     * @param bool $isSymlinkFullpath
+     */
+    public function setIsSymlinkFullpath(bool $isSymlinkFullpath)
+    {
+        $this->isSymlinkFullpath = $isSymlinkFullpath;
     }
 }

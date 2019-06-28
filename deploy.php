@@ -122,6 +122,12 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
         ->identityFile($environment->getIdentityFile())
         ->addSshOption('UserKnownHostsFile', '/dev/null')
         ->addSshOption('StrictHostKeyChecking', 'no');
+
+    //If symlink_fullpath is set as true we will deploy the symlinks using the fullpath
+    if ($environment->isSymlinkFullpath()) {
+        host($environmentName)
+            ->set("bin/symlink", "ln -s");
+    }
 }
 
 /**
