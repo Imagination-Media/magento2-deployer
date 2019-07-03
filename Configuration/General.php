@@ -121,8 +121,8 @@ task('deploy:actions:before:symlink', function () {
 task('generated:db:schema', function () {
     writeln("➤ Creating the database schema file. It will be available on var/db_schema.json");
     if ((int)get("is_composer_installation") === 1) {
-        run("cd {{release_path}} && php vendor/imaginationmedia/deployer-magento2/Helper/Scripts/db_schema_generator.php 1 {{release_path}}");
+        run("cd {{release_path}} && php vendor/imaginationmedia/deployer-magento2/Helper/Scripts/modules_schema_generator.php 1 {{release_path}}");
     } else {
-        run("cd {{release_path}} && php deployment/Helper/Scripts/db_schema_generator.php 1 {{release_path}}");
+        run("cd {{release_path}} && php deployment/Helper/Scripts/modules_schema_generator.php 1 {{release_path}}");
     }
 });

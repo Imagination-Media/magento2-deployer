@@ -53,7 +53,9 @@ Create a file `env.json` inside app/etc/deployer and configure everything about 
       "writable_dirs" : [],
       "clear_paths" : [],
       "ignored_steps" : [],
-      "composer_ignore_requirements" : false
+      "composer_ignore_requirements" : false,
+      "themes" : "",
+      "symlink_fullpath" : false
     },
     "production" : {
       "hostname" : "1.2.3.4",
@@ -77,8 +79,12 @@ Create a file `env.json` inside app/etc/deployer and configure everything about 
       "shared_files" : [],
       "shared_dirs" : [],
       "writable_dirs" : [],
-      "clear_paths" : []
+      "clear_paths" : [],
+      "themes" : "",
+      symlink_fullpath: false
     }
   }
 }
 ```
+
+For more instructions please access https://imgmedia.atlassian.net/wiki/spaces/IN/pages/585957381/Using+Imagination+Media+deployer+tool+Bitbucket+Pipelines
