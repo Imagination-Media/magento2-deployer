@@ -33,7 +33,7 @@ task('deploy:update:actions', function () {
 
     invoke_custom('generated:db:schema');
 
-    $schema = run("cat {{release_path}}/var/db_schema.json");
+    $schema = run("cat {{previous_release}}/var/db_schema.json");
     if ($configurationHelper->isSetupUpgradeNecessary($schema)) {
         invoke_custom('magento:upgrade:keep:generated');
     }
