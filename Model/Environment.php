@@ -233,7 +233,11 @@ class Environment
             (isset($environmentData["clear_paths"])) ? $environmentData["clear_paths"] : []
             )
         );
-        $this->slackWebhook = isset($environmentData["slack_webhook"]) ? $environmentData["slack_webhook"] : "";
+        $this->slackWebhook = isset($environmentData["slack_webhook"])
+            ? (is_string($environmentData["slack_webhook"])
+                ? [$environmentData["slack_webhook"]]
+                : $environmentData["slack_webhook"]
+            ) : [];
         $this->slackText = isset($environmentData["slack_text"])
             ? $environmentData["slack_text"]
             : "ATTENTION! User _{{user}}_ is deploying the branch `{{branch}}` to *{{target}}* environment.";
@@ -258,7 +262,7 @@ class Environment
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getHostName(): string
     {
@@ -266,15 +270,15 @@ class Environment
     }
 
     /**
-     * @param mixed $hostName
+     * @param string $hostName
      */
-    public function setHostName($hostName)
+    public function setHostName(string $hostName)
     {
         $this->hostName = $hostName;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUser(): string
     {
@@ -282,15 +286,15 @@ class Environment
     }
 
     /**
-     * @param mixed $user
+     * @param string $user
      */
-    public function setUser($user)
+    public function setUser(string $user)
     {
         $this->user = $user;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPassword(): string
     {
@@ -306,7 +310,7 @@ class Environment
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPort(): string
     {
@@ -314,9 +318,9 @@ class Environment
     }
 
     /**
-     * @param mixed $port
+     * @param string $port
      */
-    public function setPort($port)
+    public function setPort(string $port)
     {
         $this->port = $port;
     }
@@ -330,15 +334,15 @@ class Environment
     }
 
     /**
-     * @param mixed $deployPath
+     * @param string $deployPath
      */
-    public function setDeployPath($deployPath)
+    public function setDeployPath(string $deployPath)
     {
         $this->deployPath = $deployPath;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getBranch(): string
     {
@@ -346,9 +350,9 @@ class Environment
     }
 
     /**
-     * @param mixed $branch
+     * @param string $branch
      */
-    public function setBranch($branch)
+    public function setBranch(string $branch)
     {
         $this->branch = $branch;
     }
@@ -362,9 +366,9 @@ class Environment
     }
 
     /**
-     * @param mixed $isProduction
+     * @param int $isProduction
      */
-    public function setIsProduction($isProduction)
+    public function setIsProduction(int $isProduction)
     {
         $this->isProduction = $isProduction;
     }
@@ -378,9 +382,9 @@ class Environment
     }
 
     /**
-     * @param mixed $identityFile
+     * @param string $identityFile
      */
-    public function setIdentityFile($identityFile)
+    public function setIdentityFile(string $identityFile)
     {
         $this->identityFile = $identityFile;
     }
@@ -484,7 +488,7 @@ class Environment
     /**
      * @return string
      */
-    public function getHttpUser()
+    public function getHttpUser() : string
     {
         return $this->httpUser;
     }
@@ -492,7 +496,7 @@ class Environment
     /**
      * @param string $httpUser
      */
-    public function setHttpUser($httpUser)
+    public function setHttpUser(string $httpUser)
     {
         $this->httpUser = $httpUser;
     }
@@ -500,7 +504,7 @@ class Environment
     /**
      * @return array
      */
-    public function getSharedFiles()
+    public function getSharedFiles() : array
     {
         return $this->sharedFiles;
     }
@@ -508,7 +512,7 @@ class Environment
     /**
      * @param array $sharedFiles
      */
-    public function setSharedFiles($sharedFiles)
+    public function setSharedFiles(array $sharedFiles)
     {
         $this->sharedFiles = $sharedFiles;
     }
@@ -516,7 +520,7 @@ class Environment
     /**
      * @return array
      */
-    public function getSharedDirs()
+    public function getSharedDirs() : array
     {
         return $this->sharedDirs;
     }
@@ -524,7 +528,7 @@ class Environment
     /**
      * @param array $sharedDirs
      */
-    public function setSharedDirs($sharedDirs)
+    public function setSharedDirs(array $sharedDirs)
     {
         $this->sharedDirs = $sharedDirs;
     }
@@ -532,7 +536,7 @@ class Environment
     /**
      * @return array
      */
-    public function getWritableDirs()
+    public function getWritableDirs() : array
     {
         return $this->writableDirs;
     }
@@ -540,7 +544,7 @@ class Environment
     /**
      * @param array $writableDirs
      */
-    public function setWritableDirs($writableDirs)
+    public function setWritableDirs(array $writableDirs)
     {
         $this->writableDirs = $writableDirs;
     }
@@ -548,7 +552,7 @@ class Environment
     /**
      * @return array
      */
-    public function getClearPaths()
+    public function getClearPaths() : array
     {
         return $this->clearPaths;
     }
@@ -556,23 +560,23 @@ class Environment
     /**
      * @param array $clearPaths
      */
-    public function setClearPaths($clearPaths)
+    public function setClearPaths(array $clearPaths)
     {
         $this->clearPaths = $clearPaths;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getSlackWebhook()
+    public function getSlackWebhook() : array
     {
         return $this->slackWebhook;
     }
 
     /**
-     * @param string $slackWebhook
+     * @param array $slackWebhook
      */
-    public function setSlackWebhook($slackWebhook)
+    public function setSlackWebhook(array $slackWebhook)
     {
         $this->slackWebhook = $slackWebhook;
     }
@@ -580,7 +584,7 @@ class Environment
     /**
      * @return string
      */
-    public function getSlackText()
+    public function getSlackText() : string
     {
         return $this->slackText;
     }
@@ -588,7 +592,7 @@ class Environment
     /**
      * @param string $slackText
      */
-    public function setSlackText($slackText)
+    public function setSlackText(string $slackText)
     {
         $this->slackText = $slackText;
     }
@@ -596,7 +600,7 @@ class Environment
     /**
      * @return string
      */
-    public function getSlackSuccessText()
+    public function getSlackSuccessText() : string
     {
         return $this->slackSuccessText;
     }
@@ -604,7 +608,7 @@ class Environment
     /**
      * @param string $slackSuccessText
      */
-    public function setSlackSuccessText($slackSuccessText)
+    public function setSlackSuccessText(string $slackSuccessText)
     {
         $this->slackSuccessText = $slackSuccessText;
     }
@@ -612,7 +616,7 @@ class Environment
     /**
      * @return string
      */
-    public function getSlackFailureText()
+    public function getSlackFailureText() : string
     {
         return $this->slackFailureText;
     }
@@ -620,7 +624,7 @@ class Environment
     /**
      * @param string $slackFailureText
      */
-    public function setSlackFailureText($slackFailureText)
+    public function setSlackFailureText(string $slackFailureText)
     {
         $this->slackFailureText = $slackFailureText;
     }

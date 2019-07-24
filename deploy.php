@@ -23,6 +23,7 @@ require_once './Configuration/Mode/Update.php';
 
 use Deployer\Helper\Configuration;
 use Deployer\Task\Context;
+use Deployer\Utility\Httpie;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -153,24 +154,87 @@ task('deploy', function () {
 set('slack_color', "#15bb3c");
 set('slack_failure_color', "#fa1212");
 
+desc('Notifying Slack');
+task('custom:slack:notify', function () {
+    if (!get('slack_webhook', false)) {
+        return;
+    }
+    foreach (get('slack_webhook') as $webhook) {
+        $attachment = [
+            'title' => get('slack_title'),
+            'text' => get('slack_text'),
+            'color' => get('slack_color'),
+            'mrkdwn_in' => ['text'],
+        ];
+        Httpie::post($webhook)->body(['attachments' => [$attachment]])->send();
+    }
+})
+    ->once()
+    ->shallow()
+    ->setPrivate();
+
+
+desc('Notifying Slack about deploy finish');
+task('custom:slack:notify:success', function () {
+    if (!get('slack_webhook', false)) {
+        return;
+    }
+
+    foreach (get('slack_webhook') as $webhook) {
+        $attachment = [
+            'title' => get('slack_title'),
+            'text' => get('slack_success_text'),
+            'color' => get('slack_success_color'),
+            'mrkdwn_in' => ['text'],
+        ];
+        Httpie::post($webhook)->body(['attachments' => [$attachment]])->send();
+    }
+})
+    ->once()
+    ->shallow()
+    ->setPrivate();
+
+
+desc('Notifying Slack about deploy failure');
+task('custom:slack:notify:failure', function () {
+    if (!get('slack_webhook', false)) {
+        return;
+    }
+
+    foreach (get('slack_webhook') as $webhook) {
+        $attachment = [
+            'title' => get('slack_title'),
+            'text' => get('slack_failure_text'),
+            'color' => get('slack_failure_color'),
+            'mrkdwn_in' => ['text'],
+        ];
+        Httpie::post($webhook)->body(['attachments' => [$attachment]])->send();
+    }
+})
+    ->once()
+    ->shallow()
+    ->setPrivate();
+
 task('before:deploy:slack:notify', function () {
-    if ((string)get("slack_webhook") !== "") {
-        invoke_custom('slack:notify');
+    if (count(get("slack_webhook")) > 0) {
+        invoke_custom('custom:slack:notify');
     }
 });
 
 task('deploy:slack:success:notify', function () {
-    if ((string)get("slack_webhook") !== "") {
-        invoke_custom('slack:notify:success');
+    if (count(get("slack_webhook")) > 0) {
+        invoke_custom('custom:slack:notify:success');
     }
 });
 
 task('deploy:slack:failed:notify', function () {
-    if ((string)get("slack_webhook") !== "") {
-        invoke_custom('slack:notify:failure');
+    if (count(get("slack_webhook")) > 0) {
+        invoke_custom('custom:slack:notify:failure');
     }
 });
 
 before('deploy', 'before:deploy:slack:notify');
 after('success', 'deploy:slack:success:notify');
 after('deploy:failed', 'deploy:slack:failed:notify');
+
+after('deploy:failed', 'deploy:unlock');
