@@ -84,6 +84,10 @@ task('composer:install', function () {
     }
 });
 
+task('composer:dump', function () {
+    run("cd {{release_path}} && {{composer}} dump -o");
+});
+
 /**
  * ================================== BEFORE & AFTER COMMANDS ============================
  */
