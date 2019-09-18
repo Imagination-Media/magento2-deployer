@@ -24,7 +24,6 @@ task('deploy:update:actions', function () {
     invoke_custom('deploy:writable');
     invoke_custom('deploy:clear_paths');
     invoke_custom('composer:install');
-    invoke_custom('composer:dump');
 
     if ((int)get("is_production") === 1) {
         invoke_custom('magento:mode:production');
@@ -46,6 +45,7 @@ task('deploy:update:actions', function () {
 
     if ((int)get("is_production") === 1) {
         invoke_custom('magento:di:compile');
+        invoke_custom('composer:dump');
     }
 
     invoke_custom('magento:cache:flush');
