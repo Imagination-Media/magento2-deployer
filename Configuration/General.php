@@ -130,3 +130,44 @@ task('generated:db:schema', function () {
         run("cd {{previous_release}} && php deployment/Helper/Scripts/modules_schema_generator.php 1 {{previous_release}}");
     }
 });
+
+/**
+ * ======================================== DEPLOY FAIL ===========================================
+ */
+
+desc('Delete invalid release.');
+task('delete:invalid:release', function () {
+    run("rm -r {{release_path}}");
+});
+after('deploy:failed', 'delete:invalid:release');
+
+/**
+ * ========================================== ROLLBACK ============================================
+ */
+desc('Steps that are required after a rollback.');
+task('rollback:after:actions', function () {
+    invoke_custom("magento:maintenance:enable");
+
+    invoke_custom('deploy:actions:before');
+
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:mode:production');
+    } else {
+        invoke_custom('magento:mode:developer');
+    }
+
+    invoke_custom('magento:upgrade');
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:deploy:static');
+    }
+    if ((int)get("is_production") === 1) {
+        invoke_custom('magento:di:compile');
+        invoke_custom('composer:dump');
+    }
+
+    invoke_custom('deploy:actions:before:symlink');
+    invoke_custom('deploy:actions:after');
+
+    invoke_custom("magento:maintenance:disable");
+});
+after('rollback', 'rollback:after:actions');
