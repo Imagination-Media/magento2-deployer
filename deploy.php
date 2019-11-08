@@ -88,6 +88,8 @@ set('release_name', function () {
     return date('YmdHis');
 });
 
+set('default_timeout', null);
+
 /**
  * Configure all hosts
  * @var $environment \Deployer\Model\Environment
