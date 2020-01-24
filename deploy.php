@@ -19,7 +19,6 @@ require_once './Helper/Configuration.php';
 require_once './Model/Environment.php';
 require_once './Configuration/General.php';
 require_once './Configuration/Mode/Full.php';
-require_once './Configuration/Mode/Update.php';
 
 use Deployer\Helper\Configuration;
 use Deployer\Task\Context;
@@ -41,22 +40,6 @@ function invoke_custom($task)
         $executor->run($tasks, $hosts);
     } else {
         writeln("➤ Step ".$task." was ignored because it's set as ignored on env.json file.");
-    }
-}
-
-/**
- * =============================== GLOB function to find files including subdirectories ========================
- */
-if ( ! function_exists('glob_recursive'))
-{
-    function glob_recursive($pattern, $flags = 0)
-    {
-        $files = glob($pattern, $flags);
-        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
-        {
-            $files = array_merge($files, glob_recursive($dir.'/'.basename($pattern), $flags));
-        }
-        return $files;
     }
 }
 
@@ -139,14 +122,7 @@ foreach ($configuration->getEnvironments() as $environmentName => $environment) 
  *
  */
 task('deploy', function () {
-    if (input()->hasOption('mode') &&
-        (string)input()->getOption('mode') === "full") {
-        writeln("➤ Deploying using FULL mode");
-        invoke_custom('deploy:full:actions');
-    } else {
-        writeln("➤ Deploying using UPDATE mode");
-        invoke_custom('deploy:update:actions');
-    }
+    invoke_custom('deploy:full:actions');
 });
 
 /**
