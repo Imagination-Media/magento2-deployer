@@ -173,15 +173,12 @@ class Environment
         'var/tmp',
         'pub/sitemaps',
         'pub/media',
-        'pub/static'
+        'var/page_cache'
     ];
 
     const DEFAULT_CLEAR_PATHS = [
-        'pub/static',
         'var/cache',
-        'var/page_cache',
-        'var/view_preprocessed',
-        'generated'
+        'var/page_cache'
     ];
 
     const DEFAULT_WRITABLE_DIRS = [
