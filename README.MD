@@ -1,5 +1,5 @@
 
-# Magento 2 Deployer Tool  
+# Magento 2 Deployment Tool  
 
 Magento 2 code deployment tool with automated steps and extensibility features.  
   
