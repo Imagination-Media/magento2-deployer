@@ -16,7 +16,6 @@
 /*.zip
 /*.ini
 /.travis.yml
-/yarn.lock
 /pub/magicento2/
 /.docker-sync
 
