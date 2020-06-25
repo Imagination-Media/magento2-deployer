@@ -15,7 +15,7 @@ pipelines:
             - sh -c 'echo "$DEPLOYER_ENV" >> app/etc/deployer/env.json'
             - git clone https://github.com/deployphp/distribution.git vendor/deployer/dist
             - git clone https://github.com/deployphp/recipes.git vendor/deployer/recipes
-            - git clone git@github.com:Imagination-Media/magento2-deployer.git vendor/imaginationmedia/deployer-magento2
+            - git clone https://github.com/Imagination-Media/magento2-deployer.git vendor/imaginationmedia/deployer-magento2
             - deployerUser=$(git log master -1 --pretty=format:'%an') && git config user.name "$deployerUser"
             - cd vendor/imaginationmedia/deployer-magento2/ && dep deploy production -vvv
     staging:
@@ -31,6 +31,6 @@ pipelines:
             - sh -c 'echo "$DEPLOYER_ENV" >> app/etc/deployer/env.json'
             - git clone https://github.com/deployphp/distribution.git vendor/deployer/dist
             - git clone https://github.com/deployphp/recipes.git vendor/deployer/recipes
-            - git clone git@github.com:Imagination-Media/magento2-deployer.git vendor/imaginationmedia/deployer-magento2
+            - git clone https://github.com/Imagination-Media/magento2-deployer.git vendor/imaginationmedia/deployer-magento2
             - deployerUser=$(git log staging -1 --pretty=format:'%an') && git config user.name "$deployerUser"
             - cd vendor/imaginationmedia/deployer-magento2/ && dep deploy staging -vvv
