@@ -185,7 +185,7 @@ pipelines:
             - composer
           script:
             - cp /opt/atlassian/pipelines/agent/data/id_rsa /root/.ssh/id_rsa
-            - curl -LO https://deployer.org/releases/v6.6.0/deployer.phar && mv deployer.phar /usr/local/bin/dep && chmod +x /usr/local/bin/dep
+            - curl -LO https://github.com/Imagination-Media/magento2-deployer/raw/master/deployer/releases/6.6.0/dep && mv dep /usr/local/bin/dep && chmod +x /usr/local/bin/dep
             - mkdir -p app/etc/deployer
             - sh -c 'echo "$DEPLOYER_ENV" >> app/etc/deployer/env.json'
             - git clone https://github.com/deployphp/distribution.git vendor/deployer/dist
@@ -201,7 +201,7 @@ pipelines:
             - composer
           script:
             - cp /opt/atlassian/pipelines/agent/data/id_rsa /root/.ssh/id_rsa
-            - curl -LO https://deployer.org/releases/v6.6.0/deployer.phar && mv deployer.phar /usr/local/bin/dep && chmod +x /usr/local/bin/dep
+            - curl -LO https://github.com/Imagination-Media/magento2-deployer/raw/master/deployer/releases/6.6.0/dep && mv dep /usr/local/bin/dep && chmod +x /usr/local/bin/dep
             - mkdir -p app/etc/deployer
             - sh -c 'echo "$DEPLOYER_ENV" >> app/etc/deployer/env.json'
             - git clone https://github.com/deployphp/distribution.git vendor/deployer/dist
