@@ -257,6 +257,12 @@ You will also need to open a support ticket requesting the Bitbucket Pipelines i
 #### Cron configuration
 On JR we need to disable the cron jobs and start them again after every new deployment in order to avoid duplicated cron jobs os jobs running on incorrect code releases. We can't stop and start the cron service like we can do on AWS or MageMojo. So, in order to do that you first need to clean the crontab before a new deployment. On the **before_deploy** step you need to add the **"crontab -r"** command, it will clear the crontab, completely.
 
+```
+"before_deploy":[
+  "crontab -r"
+]
+```
+
 Then on the **after_deploy** step you need to add the Magento cron:install command. This command will setup the Magento crontab for you.
 
 ```
