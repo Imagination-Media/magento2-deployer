@@ -277,7 +277,7 @@ In case you have any other custom cron job that you need to add to the crontab, 
 
 ```
 "after_deploy":[  
-  "/usr/bin/php7.4 /home/jetrails/m2dev.shopakira.com/html/bin/magento cron:install",
+  "/usr/bin/php7.4 /home/jetrails/mystore.com/html/bin/magento cron:install",
   "(crontab -u $(whoami) -l; echo "#my command" ) | crontab -u $(whoami) -" 
 ],
 ```
