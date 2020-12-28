@@ -1,4 +1,5 @@
 
+
 # Magento 2 Deployment Tool  
 
 Magento 2 code deployment tool with automated steps and extensibility features.  
@@ -252,6 +253,38 @@ You will need to basically follow all the steps that were described above, and i
 ```
 
 You will also need to open a support ticket requesting the Bitbucket Pipelines ips to be whitelisted in your server in case you want to use bitbucket pipelines for CI/CD.
+
+#### Cron configuration
+On JR we need to disable the cron jobs and start them again after every new deployment in order to avoid duplicated cron jobs os jobs running on incorrect code releases. We can't stop and start the cron service like we can do on AWS or MageMojo. So, in order to do that you first need to clean the crontab before a new deployment. On the **before_deploy** step you need to add the **"crontab -r"** command, it will clear the crontab, completely.
+
+Then on the **after_deploy** step you need to add the Magento cron:install command. This command will setup the Magento crontab for you.
+
+```
+"after_deploy":[  
+  "/usr/bin/php7.4 /home/jetrails/mystore.com/html/bin/magento cron:install"  
+]
+```
+
+It will add something to the crontab like:
+
+```
+#~ MAGENTO START aasasasasa4s5a4s5a4s5a4s5187281728121212
+* * * * * /usr/bin/php7.4 /home/jetrails/mystore.com/releases/20201228142353/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /home/jetrails/mystore.com/releases/20201228142353/var/log/magento.cron.log
+#~ MAGENTO END aasasasasa4s5a4s5a4s5a4s5187281728121212
+```
+
+In case you have any other custom cron job that you need to add to the crontab, you can also add it to the crontab using the after_deploy step. For example:
+
+```
+"after_deploy":[  
+  "/usr/bin/php7.4 /home/jetrails/m2dev.shopakira.com/html/bin/magento cron:install",
+  "(crontab -u $(whoami) -l; echo "#my command" ) | crontab -u $(whoami) -" 
+],
+```
+
+**#my command** is the line you want to add to the crontab.
+
+**Also, please don't enable the cron for staging environments, otherwise they will dump the production configuration every time we deploy to staging. Enable CRON on staging only when needed for a test and manually. Don't add to the deployment script.**
 
 After a new production deployment make sure you check the cron_schedule table to see if any cron job got stuck during the deployment process.
 
