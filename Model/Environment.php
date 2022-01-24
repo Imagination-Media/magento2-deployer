@@ -240,7 +240,7 @@ class Environment
             : "ATTENTION! User _{{user}}_ is deploying the branch `{{branch}}` to *{{target}}* environment.";
         $this->slackSuccessText = isset($environmentData["slack_success_text"])
             ? $environmentData["slack_success_text"]
-            : "*{{target}}* was deployed without any error.";
+            : "*{{target}}* was deployed without any errors.";
         $this->slackFailureText = isset($environmentData["slack_failure_text"])
             ? $environmentData["slack_failure_text"]
             : "An error happened deploying `{{branch}}` to *{{target}}* environment.";
