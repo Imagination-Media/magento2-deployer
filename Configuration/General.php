@@ -83,6 +83,10 @@ task('composer:install', function () {
         $composerArguments .= ' --ignore-platform-reqs';
     }
 
+    if ((bool)get('is_production') === true) {
+        $composerArguments .= ' --no-dev';
+    }
+
     run("cd {{release_path}} && {{composer}} install $composerArguments");
 });
 
