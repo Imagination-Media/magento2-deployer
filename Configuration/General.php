@@ -77,11 +77,13 @@ task('magento:cache:flush', function () {
  * ================================== COMPOSER ===========================================
  */
 task('composer:install', function () {
+    $composerArguments = '';
+
     if (get("composer_ignore_requirements")) {
-        run("cd {{release_path}} && {{composer}} install --ignore-platform-reqs");
-    } else {
-        run("cd {{release_path}} && {{composer}} install");
+        $composerArguments .= ' --ignore-platform-reqs';
     }
+
+    run("cd {{release_path}} && {{composer}} install $composerArguments");
 });
 
 task('composer:dump', function () {
